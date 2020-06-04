@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.team3.mapper.orderMapper">
+
+	
+		<insert id = "insertorder">
+	insert into orders
+	(od_num , mb_id , od_address , od_address1 , 
+	od_mobile , od_name , od_total , pd_idx , od_msg)
+		values
+		(#{od_num},#{mb_id},#{od_address},#{od_address1},#{od_mobile},
+		#{od_name},#{od_total}, #{pd_idx} , #{od_msg})
+	</insert>
+	
+	<select id="selectorder" resultType="com.team3.order.vo.ordersVO">
+	select distinct 
+		od_num, mb_id ,od_address ,
+		od_address1,od_mobile,od_name,od_msg,od_total,od_date
+	from orders
+	where mb_id =#{mb_id}
+	</select>
+
+	<select id="selectorderdetail" resultType="com.team3.order.vo.ordersVO">
+	select
+		p.pd_name, o.mb_id , p.pd_price,p.pd_img_name_f, o.od_address, o.od_address1, o.od_mobile , o.od_total
+	from
+ 		product p , member m , orders o
+	where 
+		p.pd_idx = o.pd_idx and m.mb_id = o.mb_id and od_num = #{od_num}
+	</select>
+
+
+
+
+
+
+
+
+
+
+	<!-- 주문결제 페이지 맵핑 -->
+
+	<insert id = "insertpre">
+	insert into preorder (mb_id , cart_idx)
+		values
+		(#{mb_id},#{cart_idx})
+	</insert>
+
+
+
+	<select id="selectPre" resultType="com.team3.order.vo.preordersVO">
+	select pre_id , p.cart_idx , p.mb_id , c.pd_idx , c.pd_name , c.pd_img ,c.amount,
+	 c.price , c.pd_size , m.mb_id , m.mb_name
+	from cart c , preorder p , member m
+	where c.cart_idx = p.cart_idx and m.mb_id = p.mb_id and p.mb_id = #{mb_id} order by pre_id
+	</select>
+	 
+
+	
+	<select id="countpre" resultType="int">
+		select count(*) 
+		from preorder
+		where
+			mb_id = #{mb_id}
+	</select>
+	
+
+
+	
+	<select id="preSumMoney" resultType="int">
+		select ifnull(sum(c.price *c.amount) , 0)
+		from cart c , preorder p
+		where c.cart_idx =p.cart_idx and p.mb_id=#{mb_id}
+	</select>
+	
+	
+
+</mapper>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team3.mapper.MemberMapper">
+
+	<!-- 회원가입 -->
+	<insert id="insertMember" parameterType="com.team3.member.vo.MemberVO">
+	 insert into member(mb_id,mb_pw,mb_name,mb_email,mb_mobile,mb_postcode,mb_address,mb_address1,mb_birth,mb_seller,mb_date) values(#{mb_id},#{mb_pw},#{mb_name},#{mb_email},#{mb_mobile},#{mb_postcode},#{mb_address},#{mb_address1},#{mb_birth},#{mb_seller},SYSDATE())
+	</insert>
+	
+	<!-- 아이디 중복 체크 -->
+	<select id="idCheck" resultType="String">
+		select mb_id from member where mb_id=#{mb_id}
+	</select>
+	
+	<!-- 로그인/회원 check -->
+	<select id="loginMember" resultType="String" >
+		select mb_name from member where mb_id=#{mb_id} and mb_pw=#{mb_pw}
+	</select>
+	
+ 	<!-- 회원목록 -->
+	 <select id="selectMember" resultType="com.team3.member.vo.MemberVO">
+        SELECT MB_IDX, MB_ID, MB_PW, MB_NAME, MB_EMAIL, MB_MOBILE, MB_POSTCODE, MB_ADDRESS, MB_ADDRESS1, MB_BIRTH, MB_SELLER, MB_DATE, MB_RDATE  FROM MEMBER
+    </select>
+    	
+	<!-- 회원 정보 -->
+	<select id="memberInfo" resultType="com.team3.member.vo.MemberVO" >
+		select MB_ID, MB_PW, MB_NAME, MB_EMAIL, MB_MOBILE, MB_POSTCODE, MB_ADDRESS, MB_ADDRESS1, MB_BIRTH, MB_SELLER from member where mb_id=#{mb_id}
+	</select>
+	
+	<!-- 비밀번호 변경 -->
+	<update id="memberModifyPw" parameterType="com.team3.member.vo.MemberVO">
+		update member set mb_pw=#{mb_pw2}, mb_rdate=SYSDATE() where mb_id=#{mb_id} and mb_pw=#{mb_pw}
+	</update>
+	
+	<!-- 회원 정보 수정 -->
+	<update id="memberModify" parameterType="com.team3.member.vo.MemberVO">
+		update member set mb_email=#{mb_email}, mb_mobile=#{mb_mobile}, mb_postcode=#{mb_postcode}, mb_address=#{mb_address}, mb_address1=#{mb_address1}, mb_rdate=SYSDATE() where mb_id=#{mb_id}
+	</update>
+	
+	<!-- 회원 탈퇴 -->
+	<delete id="memberDelete" parameterType="com.team3.member.vo.MemberVO">
+		delete from member where mb_id=#{mb_id} and mb_pw=#{mb_pw}
+	</delete>
+	
+	<!-- 비밀번호 찾기 -->
+	<update id="changePw" parameterType="com.team3.member.vo.MemberVO">
+		update member set mb_pw=#{mb_pw2}, mb_rdate=SYSDATE() where mb_id=#{mb_id}
+	</update>
+	
+	<!-- 판매자 / 구매자 판별 -->
+	<select id="sellerCheck" resultType="int">
+		select mb_seller from member where mb_id=#{mb_id}
+	</select>
+	
+
+
+	<!-- 관리자 아이디 체크 -->
+	<select id="adminId" resultType="String" >
+		select am_id from admin where am_id=#{mb_id}
+	</select>
+	
+	
+</mapper>

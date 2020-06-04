@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.team3.mapper.cartMapper">
+	<insert id = "insertcart">
+	insert into cart(mb_id , pd_idx ,pd_name, pd_img, pd_size, price, amount)
+		values
+		(#{mb_id},#{pd_idx},#{pd_name},#{pd_img},#{pd_size},#{price},#{amount})
+	</insert>
+	
+	<select id="listCart" resultType="com.team3.cart.vo.cartDTO">
+		select cart_idx , p.pd_idx , c.mb_id , p.pd_name , amount , c.price, 
+			(c.price * amount) money , pd_img
+		from member m , cart c , product p
+		where
+			m.mb_id=c.mb_id and c.pd_idx=p.pd_idx and c.mb_id=#{mb_id} order by cart_idx
+	</select>
+	
+	<select id="cartmoney" resultType="int">
+		select ifnull(sum(c.price*amount) , 0)
+		from cart c , product p
+		where c.pd_idx =p.pd_idx and mb_id=#{mb_id}
+	</select>
+	
+	<delete id="deletecart">
+		delete from cart where cart_idx = #{cart_idx} and mb_id = #{mb_id}
+	</delete>
+	
+	<delete id="deleteAll">
+		delete from cart where mb_id=#{mb_id}
+	</delete>
+	
+
+	
+	<update id="modify">
+		update cart set amount = #{amount}
+		where 
+			mb_id = #{mb_id} and pd_idx = #{pd_idx}
+	</update>
+	
+	<select id="countcart" resultType="int">
+		select count(*) from cart
+		where
+			mb_id = #{mb_id} and pd_idx = #{pd_idx}
+	</select>
+	
+	<update id="update">
+		update cart set amount = amount + #{amount}
+		where mb_id = #{mb_id} and pd_idx = #{pd_idx}
+	</update>
+</mapper>

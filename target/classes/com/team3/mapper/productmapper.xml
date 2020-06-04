@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.team3.mapper.productmapper">
+
+	<insert id="insert">
+		insert into product (pd_category, pd_idx, pd_name , pd_price , pd_size ,pd_origin, pd_stock, member_mb_id,pd_img_name_f,pd_img_name_s )
+		values (#{pd_category},#{pd_idx},#{pd_name},#{pd_price},#{pd_size},#{pd_origin},#{pd_stock },#{member_mb_id },#{pd_img_name_f},#{pd_img_name_s})
+	</insert>
+	
+	<update id="hitUp">
+<!-- 		update product set hit=hit+1 where pd_idx=#{pd_idx} -->
+	</update>
+
+	<select id="read" resultType="com.team3.product.vo.productVO">
+		select
+		*
+		from
+		product
+		where pd_idx=#{pd_idx}
+	</select>
+
+	<update id="update">
+		update product set 
+		pd_category=#{pd_category},	pd_name=#{pd_name},pd_price=#{pd_price},pd_size=#{pd_size},pd_origin=#{pd_origin},pd_stock=#{pd_stock}
+		where pd_idx=#{pd_idx}
+	</update>
+
+	<delete id="delete">
+		delete from product where pd_idx=#{pd_idx}
+	</delete>
+
+
+	<!-- 부등호 사용할 때 <![CDATA[ ]]> 작성 -->
+	<select id="list" resultType="com.team3.product.vo.productVO">
+	<![CDATA[
+		select 
+			bid, subject, content, writer, regdate, hit
+		from
+			tbl_board
+		where bid > 0
+		order by bid desc, regdate desc
+	]]>
+	</select>
+	
+	<!-- 10개씩 보이도록! -->
+	<select id="listPage" resultType="com.team3.product.vo.productVO">
+	<![CDATA[
+		select 
+			bid, subject, content, writer, regdate, hit
+		from
+			tbl_board
+		where bid > 0
+		order by bid desc, regdate desc
+		limit #{page}, 10		
+	]]>	
+	</select>
+	
+	<!-- 판매자 페이지 -->
+	<!-- #{startPage}는 getStartPage()메소드를 호출하는 것과 같다. -->
+	<select id="sellerListCriteria" parameterType="hashmap" resultType="com.team3.product.vo.productVO">
+	<![CDATA[
+		select 
+			*
+		from
+			product
+		where pd_idx > 0 and member_mb_id = #{mb_id}
+		order by pd_idx desc, pd_date desc
+		limit #{startPage}, #{numPerPage} 	
+	]]>	
+	</select>
+	
+	<!-- sellerListCountData -->
+	<select id="sellerListCountData" resultType="int">
+		select count(pd_idx) from product where member_mb_id = #{mb_id }
+	</select>
+	
+	
+	
+	<!-- 상품 전체 갯수 세서 가장 큰 수 가져오기 -->
+	<select id="listCountData" resultType="int">
+		select ifnull(max(pd_idx),0) from product
+	</select>
+	
+	
+	
+	<!-- 검색하기  -->
+
+	<!-- MyBatis에서 제공하는 <include>, <sql>  -->
+	<sql id = "findTypeSQL">
+		<if test="findType != null">
+				and pd_category =#{findType}
+		</if>	
+	</sql>
+	
+	<sql id = "keywordSQL">
+		<if test="keyword != null">
+				and pd_name like CONCAT('%', #{keyword}, '%')
+		</if>	
+	</sql>
+
+	<select id="listFind" resultType="com.team3.product.vo.productVO">
+	<![CDATA[
+		select * from product
+		where pd_idx  > 0  
+	]]>	
+		<!-- 검색 기능 if문으로 걸러준다. -->
+		<include refid="findTypeSQL"></include>
+		<include refid="keywordSQL"></include>
+	<![CDATA[	
+		order by pd_idx desc
+		limit #{startPage}, #{numPerPage}
+	]]>
+	</select>
+	
+	<select id="findCountData" resultType="int">
+	<![CDATA[
+		select count(pd_idx)
+		from product
+		where pd_idx > 0
+	]]>
+		<!-- 검색 기능 if문으로 걸러준다. -->		
+		<include refid="findTypeSQL"></include>
+		<include refid="keywordSQL"></include>
+	</select>	
+	
+
+
+</mapper>

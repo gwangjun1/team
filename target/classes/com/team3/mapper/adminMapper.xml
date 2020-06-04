@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.team3.mapper.adminMapper">
+	<!-- 로그인/회원 check -->
+	<select id="loginAdmin" resultType="String" >
+		select am_id from admin where am_id=#{am_id} and am_pw=#{am_pw}
+	</select>
+	<!-- 전체 회원목록 -->
+	<select id="selectMember" parameterType="hashmap" resultType="com.team3.member.vo.MemberVO">
+        SELECT MB_IDX, MB_ID, MB_PW, MB_NAME, MB_EMAIL, MB_MOBILE, MB_POSTCODE, MB_ADDRESS, MB_ADDRESS1, MB_BIRTH, MB_SELLER, MB_DATE, MB_RDATE FROM MEMBER order by mb_idx desc limit #{startPage}, #{numPerPage}
+    </select>
+    <!-- 판매자/구매자별 회원 목록 -->
+	<select id="sellerList" parameterType="hashmap" resultType="com.team3.member.vo.MemberVO">
+        SELECT MB_IDX, MB_ID, MB_PW, MB_NAME, MB_EMAIL, MB_MOBILE, MB_POSTCODE, MB_ADDRESS, MB_ADDRESS1, MB_BIRTH, MB_SELLER, MB_DATE, MB_RDATE FROM MEMBER where mb_seller=#{mb_seller} order by mb_idx desc limit #{startPage}, #{numPerPage} 
+	</select>
+	<!-- 전체 회원 수 -->
+	<select id="memberCount" resultType="int">
+		select count(mb_idx) from member
+	</select>
+	<!-- 전체 상품 출력 -->
+	<select id="productList" parameterType="hashmap" resultType="com.team3.product.vo.productVO">
+		select	pd_category, pd_idx, pd_name, pd_price, pd_size, pd_origin, pd_date, member_mb_id from product order by pd_idx desc limit #{startPage}, #{numPerPage}
+	</select>
+	<!-- 카테고리별 상품 출력 -->
+	<select id="categoryList" parameterType="hashmap" resultType="com.team3.product.vo.productVO">
+		select pd_category, pd_idx, pd_name, pd_price, pd_size, pd_origin, pd_date, member_mb_id from product where pd_category=#{pd_category} order by pd_idx desc limit #{startPage}, #{numPerPage}
+	</select>
+	<!-- 판매자별 상품 출력 -->
+	<select id="sellList" parameterType="hashmap" resultType="com.team3.product.vo.productVO">
+		select pd_category, pd_idx, pd_name, pd_price, pd_size, pd_origin, pd_date, member_mb_id from product where member_mb_id=#{mb_id} order by pd_idx desc limit #{startPage}, #{numPerPage}
+	</select>
+	<!-- 전체 상품 수 -->
+	<select id="productCount" resultType="int">
+		select count(pd_idx) from product
+	</select>
+	
+	
+	<!-- 빅데이터 관련 -->
+	<!-- 신규 가입자 -->
+	<select id="todayMember" parameterType="hashmap" resultType="int">
+		select count(mb_idx) from member where mb_date like CONCAT('%',#{mb_date},'%')
+	</select>
+</mapper>
